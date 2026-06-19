@@ -1,0 +1,172 @@
+{
+  "mcpServers": {
+    "ai-datalake-platform": {
+      "command": "python",
+      "args": ["-m", "src.mcp_server.server"],
+      "env": {
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "AWS_DEFAULT_REGION": "${AWS_DEFAULT_REGION}",
+        "AWS_S3_BUCKET": "${AWS_S3_BUCKET}",
+        "PIPELINE_ENV": "${PIPELINE_ENV}"
+      }
+    }
+  },
+  "server": {
+    "name": "ai-datalake-platform",
+    "version": "1.0.0",
+    "description": "MCP Server for AI-Powered Data Lake Platform — enables Claude agents to query datasets, read metadata, check data quality, and trigger pipeline runs"
+  },
+  "tools": [
+    {
+      "name": "query_dataset",
+      "description": "Execute a SQL query against the data lake. Supports querying Bronze, Silver, and Gold layer tables via Amazon Athena.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "SQL query to execute (Athena/Presto compatible)"
+          },
+          "layer": {
+            "type": "string",
+            "enum": ["bronze", "silver", "gold"],
+            "description": "Data lake layer to query"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 100,
+            "description": "Maximum number of rows to return"
+          }
+        },
+        "required": ["query", "layer"]
+      }
+    },
+    {
+      "name": "get_schema",
+      "description": "Retrieve the schema definition for a table in the data lake, including column names, types, descriptions, and partition information.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "table_name": {
+            "type": "string",
+            "description": "Name of the table"
+          },
+          "layer": {
+            "type": "string",
+            "enum": ["bronze", "silver", "gold"],
+            "description": "Data lake layer"
+          }
+        },
+        "required": ["table_name", "layer"]
+      }
+    },
+    {
+      "name": "check_quality",
+      "description": "Get data quality metrics for a specific dataset, including completeness, accuracy, consistency, timeliness, and uniqueness scores.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dataset_name": {
+            "type": "string",
+            "description": "Name of the dataset to check"
+          },
+          "date_range": {
+            "type": "object",
+            "properties": {
+              "start": { "type": "string", "format": "date" },
+              "end": { "type": "string", "format": "date" }
+            },
+            "description": "Optional date range for quality check"
+          }
+        },
+        "required": ["dataset_name"]
+      }
+    },
+    {
+      "name": "run_pipeline",
+      "description": "Trigger a pipeline run for a specific layer or the full pipeline. Returns the pipeline execution ID for tracking.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "layer": {
+            "type": "string",
+            "enum": ["bronze", "silver", "gold", "full"],
+            "description": "Which pipeline layer to run"
+          },
+          "source": {
+            "type": "string",
+            "description": "Optional: specific source to process (e.g., 'crm', 'erp')"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, validates but does not execute"
+          }
+        },
+        "required": ["layer"]
+      }
+    },
+    {
+      "name": "generate_insight",
+      "description": "Generate AI-powered business insights from a Gold layer dataset using Claude Opus.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dataset_name": {
+            "type": "string",
+            "description": "Gold layer dataset to analyze"
+          },
+          "focus_area": {
+            "type": "string",
+            "description": "Optional area to focus analysis on (e.g., 'revenue trends', 'customer churn')"
+          },
+          "time_period": {
+            "type": "string",
+            "description": "Time period for analysis (e.g., 'last_30_days', 'Q1_2025')"
+          }
+        },
+        "required": ["dataset_name"]
+      }
+    },
+    {
+      "name": "list_datasets",
+      "description": "List all available datasets in the data lake with their metadata, row counts, and last updated timestamps.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "layer": {
+            "type": "string",
+            "enum": ["bronze", "silver", "gold", "all"],
+            "description": "Filter by data lake layer"
+          }
+        }
+      }
+    }
+  ],
+  "resources": [
+    {
+      "uri": "datalake://catalog",
+      "name": "Data Catalog",
+      "description": "Complete catalog of all datasets, tables, and their metadata",
+      "mimeType": "application/json"
+    },
+    {
+      "uri": "datalake://schemas/{table_name}",
+      "name": "Table Schema",
+      "description": "Schema definition for a specific table",
+      "mimeType": "application/json"
+    },
+    {
+      "uri": "datalake://quality/{dataset_name}",
+      "name": "Quality Report",
+      "description": "Latest data quality report for a dataset",
+      "mimeType": "application/json"
+    },
+    {
+      "uri": "datalake://pipeline/status",
+      "name": "Pipeline Status",
+      "description": "Current pipeline execution status and history",
+      "mimeType": "application/json"
+    }
+  ]
+}

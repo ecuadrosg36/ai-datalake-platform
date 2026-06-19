@@ -1,0 +1,116 @@
+# =============================================================================
+# Claude AI Configuration — AI-Powered Data Lake Platform
+# =============================================================================
+
+anthropic:
+  api_key: "${ANTHROPIC_API_KEY}"
+
+  # --- Model Selection ---
+  models:
+    # Sonnet: Fast, cost-effective — used for day-to-day tasks
+    default:
+      name: "${CLAUDE_DEFAULT_MODEL:claude-sonnet-4-20250514}"
+      max_tokens: 4096
+      temperature: 0.1
+      use_cases:
+        - "data_profiling"
+        - "schema_validation"
+        - "query_generation"
+        - "code_review"
+        - "quality_checks"
+
+    # Opus: Most capable — used for complex analysis & planning
+    analysis:
+      name: "${CLAUDE_ANALYSIS_MODEL:claude-opus-4-20250514}"
+      max_tokens: 8192
+      temperature: 0.2
+      use_cases:
+        - "insight_generation"
+        - "architecture_planning"
+        - "anomaly_analysis"
+        - "report_narratives"
+        - "complex_transformations"
+
+  # --- Rate Limiting ---
+  rate_limits:
+    requests_per_minute: 50
+    tokens_per_minute: 100000
+    retry_on_rate_limit: true
+    max_retries: 3
+    backoff_factor: 2.0
+
+  # --- Cost Tracking ---
+  cost_tracking:
+    enabled: true
+    budget_alert_usd: 50.0       # Alert when daily spend exceeds this
+    log_token_usage: true
+
+# --- AI Workflows ---
+workflows:
+  # Data Profiling: Automatically profile new datasets
+  data_profiling:
+    enabled: true
+    model: "default"
+    prompt_template: |
+      Analyze the following dataset sample and provide:
+      1. Column descriptions and inferred data types
+      2. Data quality assessment (nulls, duplicates, outliers)
+      3. Suggested transformations for the Silver layer
+      4. Business context and potential use cases
+
+      Dataset Schema: {schema}
+      Sample Data (first 10 rows): {sample_data}
+      Source System: {source_system}
+
+  # Insight Generation: Extract business insights from Gold layer
+  insight_generation:
+    enabled: true
+    model: "analysis"
+    prompt_template: |
+      You are a senior data analyst. Based on the following aggregated data
+      from our data lake Gold layer, provide:
+      1. Key business insights (top 5)
+      2. Trend analysis
+      3. Anomaly detection
+      4. Actionable recommendations
+
+      Dataset: {dataset_name}
+      Time Period: {time_period}
+      Metrics: {metrics}
+      Data: {data}
+
+  # Query Generation: Natural language to Athena SQL
+  query_generation:
+    enabled: true
+    model: "default"
+    prompt_template: |
+      Convert the following natural language question to an Amazon Athena
+      SQL query. Use the provided schema information.
+
+      Available Tables:
+      {table_schemas}
+
+      Question: {question}
+
+      Rules:
+      - Use ANSI SQL compatible with Amazon Athena (Presto)
+      - Include partition filters when applicable
+      - Use appropriate JOINs
+      - Add comments explaining the logic
+
+  # Quality Advisory: AI-driven quality recommendations
+  quality_advisory:
+    enabled: true
+    model: "default"
+    prompt_template: |
+      Review the following data quality report and provide:
+      1. Root cause analysis for quality issues
+      2. Remediation recommendations
+      3. Prevention strategies
+      4. Priority ranking of issues
+
+      Quality Report:
+      {quality_report}
+
+      Dataset: {dataset_name}
+      Layer: {layer}

@@ -1,0 +1,16 @@
+transaction_id,order_date,customer_id,product_sku,product_name,category,quantity,unit_price,total_amount,currency,payment_method,status,warehouse_id,ship_date,country,region
+ERP-TXN-001,2025-06-01,CUST-100,SKU-A1001,Industrial Valve X200,Equipment,5,1250.00,6250.00,USD,Wire Transfer,Completed,WH-MTY-01,2025-06-03,Mexico,North
+ERP-TXN-002,2025-06-01,CUST-101,SKU-B2003,Safety Helmet Pro,Safety,50,45.99,2299.50,USD,Credit Card,Completed,WH-GDL-01,2025-06-02,Mexico,West
+ERP-TXN-003,2025-06-02,CUST-102,SKU-C3005,Hydraulic Pump M500,Equipment,2,8500.00,17000.00,USD,Wire Transfer,Completed,WH-AUS-01,2025-06-05,United States,South
+ERP-TXN-004,2025-06-02,CUST-100,SKU-A1002,Industrial Valve X300,Equipment,3,1800.00,5400.00,USD,Wire Transfer,Pending,WH-MTY-01,,,Mexico,North
+ERP-TXN-005,2025-06-03,CUST-103,SKU-D4001,Conveyor Belt 2m,Machinery,10,320.00,3200.00,MXN,Bank Transfer,Completed,WH-CDMX-01,2025-06-05,Mexico,Central
+ERP-TXN-006,2025-06-03,CUST-104,SKU-E5002,Lubricant 20L Industrial,Consumables,100,28.50,2850.00,USD,Credit Card,Completed,WH-MIA-01,2025-06-04,United States,Southeast
+ERP-TXN-007,2025-06-04,CUST-105,SKU-A1001,Industrial Valve X200,Equipment,8,1250.00,10000.00,USD,Wire Transfer,Completed,WH-AUS-01,2025-06-07,United States,South
+ERP-TXN-008,2025-06-04,CUST-102,SKU-F6003,Pressure Sensor PS100,Electronics,25,175.00,4375.00,USD,Wire Transfer,Shipped,WH-AUS-01,2025-06-06,United States,South
+ERP-TXN-009,2025-06-05,,SKU-A1001,Industrial Valve X200,Equipment,1,1250.00,1250.00,USD,Cash,Completed,WH-MTY-01,2025-06-06,Mexico,North
+ERP-TXN-010,2025-06-05,CUST-106,SKU-G7001,Air Compressor AC50,Machinery,1,15000.00,15000.00,USD,Financing,Processing,WH-GDL-01,,Mexico,West
+ERP-TXN-011,2025-06-06,CUST-107,INVALID-SKU,,Unknown,-2,0.00,0.00,,Credit Card,Error,WH-ERR-99,,Unknown,Unknown
+ERP-TXN-012,2025-06-06,CUST-100,SKU-B2003,Safety Helmet Pro,Safety,200,45.99,9198.00,USD,Wire Transfer,Completed,WH-MTY-01,2025-06-08,Mexico,North
+ERP-TXN-013,2025-06-07,CUST-108,SKU-H8002,Welding Machine W100,Equipment,3,4500.00,13500.00,USD,Wire Transfer,Completed,WH-CDMX-01,2025-06-10,Mexico,Central
+ERP-TXN-014,2025-06-07,CUST-101,SKU-C3005,Hydraulic Pump M500,Equipment,1,8500.00,8500.00,USD,Credit Card,Completed,WH-GDL-01,2025-06-09,Mexico,West
+ERP-TXN-015,2025-06-08,CUST-109,SKU-A1001,Industrial Valve X200,Equipment,12,1250.00,15000.00,USD,Wire Transfer,Completed,WH-MIA-01,2025-06-11,United States,Southeast

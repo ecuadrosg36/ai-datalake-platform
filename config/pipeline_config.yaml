@@ -1,0 +1,126 @@
+# =============================================================================
+# Pipeline Configuration — AI-Powered Data Lake Platform
+# =============================================================================
+
+pipeline:
+  name: "ai-datalake-pipeline"
+  version: "1.0.0"
+  environment: "${PIPELINE_ENV:development}"
+  log_level: "${PIPELINE_LOG_LEVEL:INFO}"
+
+# --- Data Lake Layers (Medallion Architecture) ---
+layers:
+  bronze:
+    description: "Raw data ingestion layer"
+    storage:
+      type: "s3"
+      bucket: "${AWS_S3_BUCKET}"
+      prefix: "raw/"
+      format: "json"
+    retention_days: 90
+    sources:
+      - name: "crm"
+        type: "api"
+        schedule: "*/15 * * * *"     # Every 15 minutes
+      - name: "erp"
+        type: "api"
+        schedule: "0 * * * *"        # Every hour
+      - name: "csv_uploads"
+        type: "file"
+        watch_path: "s3://${AWS_S3_BUCKET}/uploads/"
+
+  silver:
+    description: "Cleaned and validated data layer"
+    storage:
+      type: "s3"
+      bucket: "${AWS_S3_BUCKET}"
+      prefix: "processed/"
+      format: "parquet"
+      compression: "snappy"
+    partitioning:
+      - "year"
+      - "month"
+      - "day"
+    quality_thresholds:
+      completeness: 0.95
+      accuracy: 0.98
+      uniqueness: 1.0
+      timeliness_hours: 24
+
+  gold:
+    description: "Business-ready analytics layer"
+    storage:
+      type: "s3"
+      bucket: "${AWS_S3_BUCKET}"
+      prefix: "curated/"
+      format: "parquet"
+      compression: "snappy"
+    partitioning:
+      - "year"
+      - "month"
+    aggregation_windows:
+      - "daily"
+      - "weekly"
+      - "monthly"
+
+# --- Processing Settings ---
+processing:
+  batch_size: 1000
+  max_retries: 3
+  retry_delay_seconds: 5
+  deduplication:
+    strategy: "hash"            # hash | fuzzy | window
+    key_columns:
+      - "record_id"
+      - "source_system"
+      - "event_timestamp"
+    window_hours: 24
+  schema_enforcement:
+    mode: "strict"              # strict | permissive | drop
+    evolution: true             # Allow backward-compatible schema changes
+
+# --- AWS Services ---
+aws:
+  region: "${AWS_DEFAULT_REGION:us-east-1}"
+  s3:
+    bucket: "${AWS_S3_BUCKET:ai-datalake-platform}"
+    lifecycle:
+      raw_to_ia_days: 30
+      ia_to_glacier_days: 180
+  glue:
+    database: "${AWS_GLUE_DATABASE:datalake_production}"
+    crawlers:
+      - name: "bronze-crawler"
+        schedule: "cron(0 */2 * * ? *)"
+        target: "raw/"
+      - name: "silver-crawler"
+        schedule: "cron(0 */1 * * ? *)"
+        target: "processed/"
+      - name: "gold-crawler"
+        schedule: "cron(0 0 * * ? *)"
+        target: "curated/"
+  athena:
+    workgroup: "datalake-workgroup"
+    output_location: "s3://${AWS_S3_BUCKET}/athena-results/"
+
+# --- Monitoring ---
+monitoring:
+  cloudwatch:
+    namespace: "AIDataLakePlatform"
+    metrics:
+      - "records_processed"
+      - "records_rejected"
+      - "pipeline_duration_seconds"
+      - "data_quality_score"
+      - "claude_api_calls"
+      - "claude_tokens_used"
+    alarms:
+      - name: "high_rejection_rate"
+        metric: "records_rejected"
+        threshold: 100
+        period: 300
+        evaluation_periods: 2
+      - name: "pipeline_failure"
+        metric: "pipeline_duration_seconds"
+        threshold: 3600
+        comparison: "GreaterThanThreshold"

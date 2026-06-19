@@ -1,0 +1,43 @@
+name: 'ai_datalake_platform'
+version: '1.0.0'
+config-version: 2
+
+profile: 'ai_datalake_athena'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+vars:
+  # Data lake S3 paths
+  bronze_database: "datalake_raw"
+  silver_database: "datalake_processed"
+  gold_database: "datalake_curated"
+  s3_bucket: "ai-datalake-platform"
+
+models:
+  ai_datalake_platform:
+    bronze:
+      +materialized: view
+      +schema: raw
+      +tags: ["bronze", "staging"]
+    silver:
+      +materialized: table
+      +schema: processed
+      +tags: ["silver", "intermediate"]
+      +post-hook:
+        - "{{ log('Silver model built: ' ~ this, info=true) }}"
+    gold:
+      +materialized: table
+      +schema: curated
+      +tags: ["gold", "reporting"]
+      +post-hook:
+        - "{{ log('Gold model built: ' ~ this, info=true) }}"

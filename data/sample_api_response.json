@@ -1,0 +1,108 @@
+{
+  "api_version": "v2",
+  "request_id": "req-abc123",
+  "timestamp": "2025-06-15T12:00:00Z",
+  "status": "success",
+  "pagination": {
+    "page": 1,
+    "per_page": 10,
+    "total_records": 45,
+    "total_pages": 5,
+    "has_next": true,
+    "next_cursor": "eyJwYWdlIjogMn0="
+  },
+  "data": [
+    {
+      "event_id": "EVT-20250615-001",
+      "event_type": "customer_interaction",
+      "source_system": "whatsapp_business",
+      "customer_id": "CUST-100",
+      "timestamp": "2025-06-15T08:30:00Z",
+      "channel": "WhatsApp",
+      "direction": "inbound",
+      "content_type": "text",
+      "sentiment": "positive",
+      "metadata": {
+        "agent_id": "AGT-05",
+        "response_time_seconds": 45,
+        "resolved": true,
+        "topic": "order_status"
+      }
+    },
+    {
+      "event_id": "EVT-20250615-002",
+      "event_type": "customer_interaction",
+      "source_system": "email",
+      "customer_id": "CUST-102",
+      "timestamp": "2025-06-15T09:15:00Z",
+      "channel": "Email",
+      "direction": "outbound",
+      "content_type": "html",
+      "sentiment": "neutral",
+      "metadata": {
+        "agent_id": "AGT-02",
+        "response_time_seconds": 1800,
+        "resolved": false,
+        "topic": "technical_support"
+      }
+    },
+    {
+      "event_id": "EVT-20250615-003",
+      "event_type": "product_view",
+      "source_system": "website",
+      "customer_id": "CUST-NEW-001",
+      "timestamp": "2025-06-15T10:00:00Z",
+      "channel": "Web",
+      "direction": "inbound",
+      "content_type": "pageview",
+      "sentiment": null,
+      "metadata": {
+        "page_url": "/products/industrial-valves",
+        "session_duration_seconds": 320,
+        "pages_viewed": 5,
+        "device": "mobile",
+        "geo": {
+          "country": "Mexico",
+          "city": "Monterrey"
+        }
+      }
+    },
+    {
+      "event_id": "EVT-20250615-004",
+      "event_type": "purchase",
+      "source_system": "ecommerce",
+      "customer_id": "CUST-104",
+      "timestamp": "2025-06-15T11:30:00Z",
+      "channel": "Web",
+      "direction": "inbound",
+      "content_type": "transaction",
+      "sentiment": "positive",
+      "metadata": {
+        "order_id": "ORD-2025-1234",
+        "total_amount": 3450.00,
+        "currency": "USD",
+        "items_count": 3,
+        "payment_method": "credit_card",
+        "is_repeat_customer": true
+      }
+    },
+    {
+      "event_id": "EVT-20250615-005",
+      "event_type": "support_ticket",
+      "source_system": "helpdesk",
+      "customer_id": "CUST-105",
+      "timestamp": "2025-06-15T14:00:00Z",
+      "channel": "Support Portal",
+      "direction": "inbound",
+      "content_type": "ticket",
+      "sentiment": "negative",
+      "metadata": {
+        "ticket_id": "TKT-8899",
+        "priority": "high",
+        "category": "product_defect",
+        "sla_deadline": "2025-06-16T14:00:00Z",
+        "assigned_to": "AGT-01"
+      }
+    }
+  ]
+}

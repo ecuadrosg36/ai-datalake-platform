@@ -1,0 +1,86 @@
+{
+  "report_date": "2025-06-15",
+  "layer": "gold",
+  "dataset": "daily_business_metrics",
+  "records": [
+    {
+      "date": "2025-06-01",
+      "total_revenue_usd": 28349.50,
+      "transaction_count": 4,
+      "unique_customers": 4,
+      "avg_order_value_usd": 7087.38,
+      "top_category": "Equipment",
+      "top_country": "Mexico",
+      "new_leads": 2,
+      "conversion_rate": 0.15,
+      "customer_interactions": 12,
+      "avg_response_time_minutes": 8.5,
+      "data_quality_score": 0.96
+    },
+    {
+      "date": "2025-06-02",
+      "total_revenue_usd": 22400.00,
+      "transaction_count": 3,
+      "unique_customers": 3,
+      "avg_order_value_usd": 7466.67,
+      "top_category": "Equipment",
+      "top_country": "United States",
+      "new_leads": 1,
+      "conversion_rate": 0.12,
+      "customer_interactions": 8,
+      "avg_response_time_minutes": 12.3,
+      "data_quality_score": 0.94
+    },
+    {
+      "date": "2025-06-03",
+      "total_revenue_usd": 6050.00,
+      "transaction_count": 3,
+      "unique_customers": 3,
+      "avg_order_value_usd": 2016.67,
+      "top_category": "Consumables",
+      "top_country": "Mexico",
+      "new_leads": 3,
+      "conversion_rate": 0.18,
+      "customer_interactions": 15,
+      "avg_response_time_minutes": 6.2,
+      "data_quality_score": 0.98
+    },
+    {
+      "date": "2025-06-04",
+      "total_revenue_usd": 14375.00,
+      "transaction_count": 2,
+      "unique_customers": 2,
+      "avg_order_value_usd": 7187.50,
+      "top_category": "Equipment",
+      "top_country": "United States",
+      "new_leads": 0,
+      "conversion_rate": 0.10,
+      "customer_interactions": 6,
+      "avg_response_time_minutes": 15.1,
+      "data_quality_score": 0.97
+    },
+    {
+      "date": "2025-06-05",
+      "total_revenue_usd": 16250.00,
+      "transaction_count": 2,
+      "unique_customers": 2,
+      "avg_order_value_usd": 8125.00,
+      "top_category": "Machinery",
+      "top_country": "Mexico",
+      "new_leads": 1,
+      "conversion_rate": 0.14,
+      "customer_interactions": 10,
+      "avg_response_time_minutes": 9.8,
+      "data_quality_score": 0.92
+    }
+  ],
+  "summary": {
+    "total_revenue_usd": 87424.50,
+    "total_transactions": 14,
+    "avg_daily_revenue_usd": 17484.90,
+    "avg_quality_score": 0.954,
+    "revenue_trend": "stable",
+    "top_customer": "CUST-100",
+    "top_product": "Industrial Valve X200"
+  }
+}

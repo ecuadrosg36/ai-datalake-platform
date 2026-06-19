@@ -1,0 +1,19 @@
+ai_datalake_athena:
+  target: dev
+  outputs:
+    dev:
+      type: athena
+      s3_staging_dir: "s3://ai-datalake-platform/athena-results/"
+      region_name: us-east-1
+      database: datalake_processed
+      schema: dev
+      work_group: datalake-workgroup
+      num_retries: 3
+    prod:
+      type: athena
+      s3_staging_dir: "s3://ai-datalake-platform/athena-results/"
+      region_name: us-east-1
+      database: datalake_processed
+      schema: prod
+      work_group: datalake-workgroup
+      num_retries: 5

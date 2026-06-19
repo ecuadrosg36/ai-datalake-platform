@@ -1,0 +1,41 @@
+# =============================================================================
+# AI-Powered Data Lake Platform — Dependencies
+# =============================================================================
+
+# --- AI / Anthropic ---
+anthropic>=0.39.0              # Claude API client (Sonnet + Opus)
+
+# --- AWS ---
+boto3>=1.34.0                  # AWS SDK for Python
+botocore>=1.34.0               # AWS low-level client
+
+# --- Data Processing ---
+pandas>=2.1.0                  # DataFrame operations
+pyarrow>=14.0.0                # Parquet read/write
+pyspark>=3.5.0                 # Distributed data processing
+
+# --- MCP (Model Context Protocol) ---
+mcp>=1.0.0                     # MCP Server SDK
+
+# --- Configuration ---
+pyyaml>=6.0                    # YAML config parsing
+python-dotenv>=1.0.0           # Environment variable management
+
+# --- Data Quality & Validation ---
+jsonschema>=4.20.0             # JSON schema validation
+great-expectations>=0.18.0     # Data quality framework
+
+# --- API & Connectivity ---
+requests>=2.31.0               # HTTP client
+
+# --- DBT ---
+dbt-core>=1.7.0                # DBT core
+dbt-athena-community>=1.7.0    # DBT Athena adapter
+
+# --- Dev / Testing ---
+pytest>=7.4.0                  # Testing framework
+pytest-cov>=4.1.0              # Coverage reporting
+pytest-asyncio>=0.23.0         # Async test support
+moto[s3,glue,athena]>=5.0.0    # AWS mocking
+ruff>=0.1.0                    # Linting
+mypy>=1.7.0                    # Type checking

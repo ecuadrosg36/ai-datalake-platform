@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest:*)",
+      "Bash(python -m mypy:*)",
+      "Bash(python -m flake8:*)",
+      "Bash(python -m black:*)",
+      "Bash(pip install:*)",
+      "Bash(pip list:*)",
+      "Bash(git:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(grep:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -m black --quiet --line-length 120 $FILE 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}
