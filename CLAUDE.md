@@ -92,3 +92,34 @@ python -m flake8 src/ --max-line-length=120
 See `docs/architecture.md` for the full Medallion Architecture diagram.
 See `docs/claude_integration.md` for Claude Sonnet vs Opus decision matrix.
 See `docs/mcp_integration.md` for MCP tool and resource specifications.
+
+<!-- trimaran-stack:rules (always-follow; do not delete) -->
+
+# The five Trimaran rules (always follow)
+
+These are guardrails earned from real incidents. Apply them on every task; the full rationale
+for each is in `rules/<n>-*.md` in this plugin, and `install.sh` inlines them into each repo's
+CLAUDE.md (which is always loaded).
+
+1. **memory-discipline** — Write every non-obvious lesson down as a rule (per-repo CLAUDE.md or
+   the global memory index) instead of correcting it conversationally. It compounds forever.
+
+2. **write-scope-guard** — Declare allowed write paths before writing. Write only *safe copies*;
+   never a live system of record / prod account without an explicit human gate this session.
+   Bridges are append-only + key-rotated. Snapshot before edit. *(Scar: Casa Prime "safe Excel
+   copies only"; OGGI append-only bridge.)*
+
+3. **verification-closes-the-loop** — "Done" = the *real behavior observed correct*, not the
+   harness saying OK. Reconcile data to a known-good number, not a row count. Beware false-healthy
+   monitors; add a liveness heartbeat. *(Scar: ProcessRecorder Guardian read HEALTHY while the
+   fleet was frozen; Casa Prime false-zero digests.)*
+
+4. **never-loosen-the-gate** — If a guard/test/threshold blocks you, fix the cause — never weaken
+   the check to go green. A false positive gets *proven and fixed at the source*, not suppressed.
+   *(Scar: Shyla tautology-fix rejected; Samurai iron rule.)*
+
+5. **long-loop-safety** — For autonomous `/goal`+`/loop` runs: small editable surface, immutable
+   harness, fixed budget, one metric, adversarial check before commit, liveness heartbeat.
+   *(Shape: Karpathy autoresearch.)*
+
+The 5 pillars these serve: **Automation · Worktrees · Skills · Connectors · Sub-agents.**
