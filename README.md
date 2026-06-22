@@ -506,28 +506,103 @@ claude
 
 ## 🏢 OGGI Data Lake — Onboarding Status
 
-This project is being integrated with **Trimaran's OGGI Data Lake** production infrastructure.
+This project is being integrated with **Trimaran's OGGI Data Lake** production infrastructure.  
+OGGI is a **Mexican fashion/apparel company** that manufactures clothing and sells through retail chains: **Coppel, Sears, Suburbia**.
 
 ### AWS Access (Provided by Rodolfo)
 
 | Resource | Details | Status |
 |----------|---------|--------|
-| **AWS Account** | `276483282865` | ✅ Credentials configured |
+| **AWS Account** | `276483282865` | ✅ Configured |
 | **Region** | `us-east-2` | ✅ Set in AWS CLI |
 | **IAM User** | `enmanuel.cuadros` | ✅ Created |
-| **MFA** | Google Authenticator required | 🔴 Pending setup |
-| **S3 Buckets** | `oggi-lakehouse-landing`, `oggi-gm3s-landing` | 🔒 Requires MFA session |
-| **Athena** | Workgroup `oggi_lake` | 🔒 Requires MFA session |
-| **Glue Databases** | `oggi_bronze`, `oggi_lake`, `oggi_ontology` | 🔒 Requires MFA session |
-| **CodeCommit** | `oggi-bronze-crackers`, `oggi-ontology-dbt` | 🔴 Git credentials 403 — escalated |
+| **MFA** | Device `aws-claude` (Google Authenticator) | ✅ Configured & working |
+| **S3 Bucket** | `oggi-lakehouse-landing-276483282865-us-east-2` | ✅ Explored (18 folders) |
+| **Glue Databases** | `oggi_bronze`, `oggi_lake`, `oggi_ontology` | ✅ Explored (schemas mapped) |
+| **Athena** | Workgroup `oggi_lake` | ⏳ ListWorkGroups denied — direct query TBD |
+| **CodeCommit** | `oggi-bronze-crackers`, `oggi-ontology-dbt` | 🔴 403 — credential invalid (escalated) |
 
-### Data Sources (From Client)
+### S3 Data Lake Structure (Discovered 2026-06-22)
 
-| Source | System | Read Method | Status |
-|--------|--------|------------|--------|
-| ERP | SAP ONE, Intelisis | Export/API | 📋 To be explored |
-| Email/Files | MS365 Graph API, OneDrive | Graph API | 📋 To be explored |
-| Messaging | WhatsApp | TBD (.txt export or API) | 📋 To be explored |
+```
+oggi-lakehouse-landing-276483282865-us-east-2/
+├── raw/              ← 4 files (Aspel NOI payroll backups, 2.7 GB)
+├── bronze-parquet/   ← Bronze layer in Parquet
+├── silver/           ← 82,681 files! (Aspel-COI, facturas, WMS, Sears XML, 55+ datasets)
+├── gold/             ← 87 files (PnL, sell-in, rentabilidad, maquila, demand sensing)
+├── ontology/         ← Business ontology (dbt models: party merge, item xref, DQ scorecard)
+├── canonical/        ← Canonical/master data
+├── finanzas/         ← Financial docs (CFDI XMLs + PDFs — thousands of invoices)
+├── coppel/           ← 12,974 files (daily sell-out data from Coppel)
+├── sears/            ← Sears retail chain data
+├── suburbia/         ← Suburbia retail chain data
+├── drive/            ← OneDrive/shared files
+├── dashboards/       ← Dashboard data
+├── backups/          ← Backups
+├── _athena_results/  ← Athena query results
+├── _code/            ← ETL code
+├── _meta/            ← Metadata
+├── athena/           ← Athena workgroup storage
+└── runner-code/      ← Runner/pipeline code
+```
+
+### Key Tables Discovered
+
+| Database | Table | Records | Description |
+|----------|-------|---------|-------------|
+| `oggi_lake` | **`g_factura_line`** | **12,748,379** 🔥 | Invoice line items — THE core table |
+| `oggi_lake` | `g_dim_articulo` | 44,051 | Product/SKU catalog |
+| `oggi_lake` | `g_dim_company` | 9 | OGGI legal entities (Mayoreo, Junior, SOF, Bluster, Dyclass, Buying, Nómina) |
+| `oggi_lake` | `fct_sell_in` | — | Sell-in facts (12 MB Parquet) |
+| `oggi_lake` | `rentabilidad_cliente` | — | Client profitability (1.3 MB, daily snapshots) |
+| `oggi_lake` | `pnl_canonical` | — | P&L canonical (53 KB, daily snapshots) |
+| `oggi_lake` | `fct_production_order` | — | Production orders (649 KB) |
+| `oggi_lake` | `fct_bom_intensity` | 19,948 | Bill of materials intensity |
+| `oggi_ontology` | `catalog_master` | — | Master catalog of all data assets |
+| `oggi_ontology` | `dq_scorecard` | — | Data quality scorecard |
+| `oggi_ontology` | `action_party_merge_candidates` | — | Fuzzy-matched party duplicates |
+| `oggi_bronze` | *(thousands)* | — | CFDI XMLs, PDFs from `oggi-finanzas-docs` crawler |
+
+### OGGI Company Entities (from `dim_company` Parquet)
+
+| Company ID | Name | Role | Revenue? |
+|-----------|------|------|----------|
+| SJMC | OGGI Mayoreo | Ventas a Coppel (cadenas) | ✅ Q1: $219M |
+| SJM0 | OGGI Junior | Tiendas propias y distribuidores | ✅ Q1: $64M |
+| SJM1 | OGGI Teziutlán | Planta y operación Puebla | ✅ Q1: $10M |
+| SOF0 | SOF / Open Fashion | Comercializadora alterna | ✅ Q1: $800K |
+| BUYING | Buying Compras | Paga maquila externa | COGS source |
+| SDY0 | Dyclass | Servicios administrativos | Overhead |
+| SBS0 | BluSter | Marca — cobra regalías | Overhead |
+
+### Silver Layer Datasets (55+ sources)
+
+| Category | Datasets |
+|----------|----------|
+| **ERP (GM3S)** | `facturas`, `pagos`, `pedidos`, `customer`, `company`, `item`, `vendor` |
+| **Accounting (Aspel)** | `aspel-coi` (contabilidad), `aspel-noi` (nómina) |
+| **WMS/Warehouse** | `location`, `warehouse`, `carrier`, `receipt_*`, `shipment_*`, `location_inventory` |
+| **Sales** | `VTA`, `PED`, `INV`, `presupuesto-ventas` |
+| **Sears** | `xml_provsears_*` (daily inventory + sales XML reports) |
+| **SKU/Products** | `productos-sku`, `item_unit_of_measure`, `CAT` |
+| **Operations** | `process_history`, `transaction_history`, `labor_management_detail` |
+
+### Gold Layer Analytics (32+ models)
+
+| Model | What It Does |
+|-------|-------------|
+| `pnl_canonical` | Profit & Loss by company (daily snapshots) |
+| `rentabilidad_cliente` | Client profitability analysis |
+| `fct_sell_in` | Sell-in revenue facts (12.7M lines) |
+| `fct_production_order` | Production order tracking |
+| `fct_bom_intensity` | Bill of materials per SKU |
+| `fct_maquila_*` | Maquila cost, assignment, quality, scorecard |
+| `coppel_demand_sensing` | Demand forecasting for Coppel |
+| `coppel_replenishment` | Replenishment planning |
+| `coppel_sellout_history` | Sell-out history from Coppel stores |
+| `size_curve` / `size_misalignment` | Size distribution analytics |
+| `oggi_action_levers` | Action recommendations |
+| `signal_maturity_tracker` | Data signal maturity |
 
 ### What's Been Done ✅
 
@@ -541,22 +616,25 @@ This project is being integrated with **Trimaran's OGGI Data Lake** production i
 - [x] AWS CLI configured (us-east-2, credentials set)
 - [x] Project pushed to GitHub: [ecuadrosg36/ai-datalake-platform](https://github.com/ecuadrosg36/ai-datalake-platform)
 - [x] Python3 Windows shim for cc-sensei hooks compatibility
-- [x] Trimaran CHECKLIST.md and CLAUDE.template.md added
+- [x] **MFA configured** — Device `aws-claude`, Google Authenticator ✅
+- [x] **S3 bucket explored** — 18 top-level folders, 95K+ files discovered
+- [x] **Glue databases mapped** — 3 databases, all table schemas documented
+- [x] **dim_company Parquet downloaded** — 9 OGGI entities with Q1 revenue data
+- [x] **Silver layer cataloged** — 55+ datasets (ERP, Aspel, WMS, Sears, SKU)
+- [x] **Gold layer cataloged** — 32+ analytics models (PnL, demand sensing, maquila)
 
 ### What's Pending 🔴
 
-- [ ] **MFA Setup** — Fix permission error for self-assigning MFA device (escalated to Rodolfo)
-- [ ] **CodeCommit Clone** — Git 403 error persists even with new credentials (escalated to Rodolfo)
-- [ ] **Explore S3 Buckets** — List contents of `oggi-lakehouse-landing` and `oggi-gm3s-landing` (requires MFA)
-- [ ] **Query Athena** — Explore `oggi_bronze`, `oggi_lake`, `oggi_ontology` tables (requires MFA)
+- [ ] **CodeCommit Clone** — Git 403 (`security token invalid`) — Rodolfo needs to regenerate credentials
+- [ ] **Query Athena** — Run SQL queries against `g_factura_line` (12.7M rows) and `pnl_canonical`
+- [ ] **Download more sample data** — `fct_sell_in`, `rentabilidad_cliente`, `pnl_canonical` Parquets
 - [ ] **Fill CLAUDE.md Placeholders** — Add real OGGI accounts, sources, freshness cadences
-- [ ] **Build Real Pipeline** — Create a pipeline using OGGI's actual data (SAP ONE, Intelisis)
-- [ ] **Add SAP ONE Connector** — Bronze layer connector for SAP ONE ERP data
-- [ ] **Add Intelisis Connector** — Bronze layer connector for Intelisis ERP data
-- [ ] **Add MS365 Graph API Connector** — Email/OneDrive ingestion via Microsoft Graph
+- [ ] **Build Real Pipeline** — Connect our `ai-datalake-platform` to OGGI's actual S3 data
+- [ ] **Add OGGI Connector** — Bronze layer connector for GM3S ERP (facturas, pagos, pedidos)
+- [ ] **Add Aspel Connector** — Bronze layer connector for Aspel COI/NOI accounting data
+- [ ] **Add Coppel Connector** — Sell-out data ingestion from `coppel/` daily feeds
 - [ ] **Gold Layer Tests** — Currently 0% coverage (flagged by /pipeline-health)
 - [ ] **AI Response Caching** — 1-hour TTL cache required by CLAUDE.md but not yet implemented
-- [ ] **Update Model IDs** — Change to `claude-opus-4-8` / `claude-sonnet-4-6`
 
 ---
 
