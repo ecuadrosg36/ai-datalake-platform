@@ -615,26 +615,87 @@ oggi-lakehouse-landing-276483282865-us-east-2/
 - [x] CC-Sensei coaching plugin installed (bilingual EN/ES)
 - [x] AWS CLI configured (us-east-2, credentials set)
 - [x] Project pushed to GitHub: [ecuadrosg36/ai-datalake-platform](https://github.com/ecuadrosg36/ai-datalake-platform)
-- [x] Python3 Windows shim for cc-sensei hooks compatibility
 - [x] **MFA configured** — Device `aws-claude`, Google Authenticator ✅
 - [x] **S3 bucket explored** — 18 top-level folders, 95K+ files discovered
 - [x] **Glue databases mapped** — 3 databases, all table schemas documented
 - [x] **dim_company Parquet downloaded** — 9 OGGI entities with Q1 revenue data
 - [x] **Silver layer cataloged** — 55+ datasets (ERP, Aspel, WMS, Sears, SKU)
 - [x] **Gold layer cataloged** — 32+ analytics models (PnL, demand sensing, maquila)
+- [x] **OGGI S3 Connector built** — `oggi_s3_connector.py` with 31 passing tests ✅
+- [x] **CodeCommit repos cloned** — `oggi-bronze-crackers` + `oggi-ontology-dbt` ✅
 
-### What's Pending 🔴
+### CodeCommit Repos (Cloned 2026-06-22)
 
-- [ ] **CodeCommit Clone** — Git 403 (`security token invalid`) — Rodolfo needs to regenerate credentials
+#### 🔨 [oggi-bronze-crackers](file:///c:/Users/enman/Downloads/ANTIGRAVITY/oggi-bronze-crackers) — ERP Data Extraction
+
+Converts **raw database dumps** (Postgres, Firebird, SQL Server) into **queryable Parquet** in S3, triggered automatically by EventBridge when a dump lands.
+
+```
+dump lands in S3 → EventBridge → Dispatcher Lambda →
+  ├─ GM3  (Postgres/pg_restore)  → Fargate task
+  ├─ Aspel (Firebird/gbak)       → Fargate task (1 per empresa)
+  └─ WMS  (SQL Server/RESTORE)   → Batch/EC2 (104GB .bak files)
+→ s3://lake/bronze-parquet/source=<src>/table=<t>/dt=<YYYY-MM-DD>/part-0.parquet
+→ Glue Data Catalog (oggi_bronze) → Athena/dbt → silver + gold
+```
+
+| Source | Engine | Tables Extracted | Status |
+|--------|--------|-----------------|--------|
+| **GM3** (ERP) | PostgreSQL | `d_factura_c`, all tables mode | ✅ Production |
+| **Aspel COI** | Firebird | Contabilidad tables | ⚠️ Verify table names against real `.fbk` |
+| **Aspel NOI** | Firebird | Nómina tables | ⚠️ Verify table names |
+| **WMS** | SQL Server | **Placeholder** table names | 🔴 Need real tables from RESTORE |
+| **Finanzas** | None (Glue crawler) | PDFs, CFDIs | ✅ Cataloged |
+
+#### 🧠 [oggi-ontology-dbt](file:///c:/Users/enman/Downloads/ANTIGRAVITY/oggi-ontology-dbt) — Semantic Layer (Palantir-style)
+
+dbt-athena project that turns cracked ERP data into a **governed ontology**: golden entities, links (graph), metrics, Actions, and RAG retrieval.
+
+```
+models/
+├── staging/       ← Views over bronze tables
+├── intermediate/  ← Intermediate transformations
+├── mdm/           ← Master Data (mdm_party, mdm_item, item_xref, party_xref)
+├── objects/       ← 28 domain objects (invoice, expense, payroll, inventory, etc.)
+├── links/         ← Graph edges between objects
+├── metrics/       ← Business metrics (PnL, profitability, reconciliation)
+├── actions/       ← Action store (party_merge, item_xref candidates)
+└── security/      ← Row-level security
+```
+
+**Key Files:**
+- `AUDIT_2026-06-21.md` — Adversarial audit by 6 AI auditors (29 agents, ~1.2M tokens)
+- `actions/rag_build.py` — Builds RAG index with Bedrock Titan v2
+- `actions/ontology_mcp.py` — MCP server for agent-facing semantic search
+- `buildspec.yml` — AWS CodeBuild CI/CD pipeline
+
+**Audit Findings Fixed:**
+- ✅ Fixed 8x snapshot inflation in customer profitability ($68B → $8.6B)
+- ✅ Fixed P&L snapshot inflation ($734M → $91.7M)
+- ✅ Fixed empty `item_xref` (0 → 12,818 rows)
+- ✅ Fixed invoice-party coverage (96.4% → 98.3%)
+
+### What's Pending 🔴 — Next Steps
+
+#### Immediate (This Week)
+- [ ] **Study `oggi-bronze-crackers`** — Understand the GM3/Aspel/WMS cracker pipeline
+- [ ] **Study `oggi-ontology-dbt`** — Understand the 28 object models and semantic layer
+- [ ] **Run dbt locally** — `dbt build --profiles-dir .` against Athena (needs profile config)
 - [ ] **Query Athena** — Run SQL queries against `g_factura_line` (12.7M rows) and `pnl_canonical`
-- [ ] **Download more sample data** — `fct_sell_in`, `rentabilidad_cliente`, `pnl_canonical` Parquets
+- [ ] **Download more sample data** — `fct_sell_in`, `rentabilidad_cliente`, `pnl_canonical`
+
+#### Short-term (Next 2 Weeks)
+- [ ] **Verify Aspel table names** — Compare `crackers/aspel/tables.yml` against real `.fbk` file
+- [ ] **Fix WMS placeholders** — Run `RESTORE FILELISTONLY` to get real table names
+- [ ] **Address audit findings** — Fix gold snapshot inflation, silver catalog explosion
+- [ ] **Build Coppel Connector** — Sell-out data ingestion from `coppel/` daily feeds
 - [ ] **Fill CLAUDE.md Placeholders** — Add real OGGI accounts, sources, freshness cadences
-- [ ] **Build Real Pipeline** — Connect our `ai-datalake-platform` to OGGI's actual S3 data
-- [ ] **Add OGGI Connector** — Bronze layer connector for GM3S ERP (facturas, pagos, pedidos)
-- [ ] **Add Aspel Connector** — Bronze layer connector for Aspel COI/NOI accounting data
-- [ ] **Add Coppel Connector** — Sell-out data ingestion from `coppel/` daily feeds
-- [ ] **Gold Layer Tests** — Currently 0% coverage (flagged by /pipeline-health)
-- [ ] **AI Response Caching** — 1-hour TTL cache required by CLAUDE.md but not yet implemented
+
+#### Medium-term (Month 1)
+- [ ] **Integrate `ai-datalake-platform` with OGGI ontology** — Use MCP tools from ontology_mcp.py
+- [ ] **Build RAG pipeline** — Connect our AI layer to the ontology's semantic search
+- [ ] **Production pipeline** — Deploy connectors to AWS (Lambda/Fargate)
+- [ ] **Dashboard MVP** — Build first business dashboard using gold layer data
 
 ---
 
@@ -645,3 +706,4 @@ oggi-lakehouse-landing-276483282865-us-east-2/
 - GitHub: [@ecuadrosg36](https://github.com/ecuadrosg36)
 
 *Built with ❤️ using Claude AI, Boris Cherny's Claude Code workflow, and Trimaran's lakehouse standard — demonstrating how one engineer with AI tools can deliver enterprise-grade data lake solutions.*
+
