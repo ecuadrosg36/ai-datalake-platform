@@ -429,8 +429,141 @@ Step 4: SERVE (MCP Server + Reports)
 
 ---
 
+## 🥋 Claude Code Workflow (Boris Cherny + Trimaran)
+
+This project is configured with a professional Claude Code workflow, combining **Boris Cherny's 23 tips** (the creator of Claude Code), **Trimaran's production lakehouse standard**, and **CC-Sensei coaching**.
+
+### What's Configured
+
+```
+.claude/
+├── commands/                    # Slash commands (type / in Claude Code)
+│   ├── run-tests.md            #   /run-tests → runs 61 tests + coverage report
+│   ├── pipeline-health.md      #   /pipeline-health → spawns 4 agents to audit all layers
+│   ├── review-changes.md       #   /review-changes → git diff + code review
+│   └── commit-push-pr.md       #   /commit-push-pr → commit, push, open PR
+│
+├── agents/                      # Specialized AI sub-agents
+│   ├── planner.md              #   Plans features by Medallion layer
+│   ├── code-reviewer.md        #   Security, conventions, data pattern review
+│   ├── build-validator.md      #   Full verification pipeline (test + lint + typecheck)
+│   └── self-improvement.md     #   Factory of factories — learns from mistakes
+│
+├── skills/                      # Reusable workflow recipes
+│   ├── data-pipeline-tdd.md    #   TDD cycle for data pipelines
+│   ├── self-improvement-loop.md #   Planner → Generator → Critic → Tester → Persist
+│   └── data-triangulation.md   #   Cross-validate data across ERP, Excel, WhatsApp
+│
+├── settings.json                # Hook permissions + safe commands
+├── CLAUDE.template.md           # Trimaran lakehouse CLAUDE.md template
+└── TRIMARAN_CHECKLIST.md        # Trimaran 5-pillar rubric
+```
+
+### Installed Plugins
+
+| Plugin | Version | What It Does |
+|--------|---------|-------------|
+| **trimaran-lakehouse** | v0.1.0 | Trimaran's production data lake standard — 3 agents (`lakehouse-architect`, `dataops-engineer`, `iac-reviewer`), 7 skills (`medallion-design`, `ingestion-pattern`, `data-quality-suite`, `iac-scaffold`, `cost-audit`, `lakehouse-rules`, `rules`) |
+| **cc-sensei** | v0.5.3 | AI coaching system — watches you work in Claude Code and surfaces one power-user tip at the right moment. Bilingual EN/ES. 24 curriculum rules, mastery tracking, anti-Clippy gate |
+
+### CLAUDE.md Rules
+
+The project's `CLAUDE.md` contains:
+- **Project conventions** — code style, data engineering patterns, testing rules
+- **Trimaran's 5 always-follow rules** (L1–L5):
+  1. 🥉 **Medallion discipline** — never mutate bronze; idempotent, `dt`-partitioned
+  2. 💰 **Cost-aware storage** — watch requests + GIR, not just storage
+  3. 🏗️ **IaC for everything** — no console clickops, least-privilege IAM
+  4. ✅ **Quality is a gate** — zero-vs-missing distinguished, self-healing loop
+  5. 🎯 **Reconcile to the centavo** — fresh baselines, never manufacture false drift
+
+### How to Use It
+
+```bash
+# Start Claude Code in this project
+cd ai-datalake-platform
+claude
+
+# Run tests (Boris Tip #7 — Custom Commands)
+> /run-tests
+
+# Audit the full pipeline (spawns 4 agents in parallel)
+> /pipeline-health
+
+# Use Trimaran agents
+> @lakehouse-architect Design the medallion layout for SAP ONE and Intelisis data
+> @dataops-engineer Set up data quality gates for Bronze→Silver
+> @iac-reviewer Review the CloudFormation stack for cost and security
+
+# Check your Claude Code learning progress
+> /sensei progress
+
+# Use Plan Mode (Boris Tip — Shift+Tab ×2)
+> Shift+Tab → Shift+Tab → "Add WhatsApp connector to Bronze layer"
+```
+
+---
+
+## 🏢 OGGI Data Lake — Onboarding Status
+
+This project is being integrated with **Trimaran's OGGI Data Lake** production infrastructure.
+
+### AWS Access (Provided by Rodolfo)
+
+| Resource | Details | Status |
+|----------|---------|--------|
+| **AWS Account** | `276483282865` | ✅ Credentials configured |
+| **Region** | `us-east-2` | ✅ Set in AWS CLI |
+| **IAM User** | `enmanuel.cuadros` | ✅ Created |
+| **MFA** | Google Authenticator required | 🔴 Pending setup |
+| **S3 Buckets** | `oggi-lakehouse-landing`, `oggi-gm3s-landing` | 🔒 Requires MFA session |
+| **Athena** | Workgroup `oggi_lake` | 🔒 Requires MFA session |
+| **Glue Databases** | `oggi_bronze`, `oggi_lake`, `oggi_ontology` | 🔒 Requires MFA session |
+| **CodeCommit** | `oggi-bronze-crackers`, `oggi-ontology-dbt` | 🔴 Git credentials 403 — escalated |
+
+### Data Sources (From Client)
+
+| Source | System | Read Method | Status |
+|--------|--------|------------|--------|
+| ERP | SAP ONE, Intelisis | Export/API | 📋 To be explored |
+| Email/Files | MS365 Graph API, OneDrive | Graph API | 📋 To be explored |
+| Messaging | WhatsApp | TBD (.txt export or API) | 📋 To be explored |
+
+### What's Been Done ✅
+
+- [x] Project built with complete Medallion Architecture (Bronze/Silver/Gold)
+- [x] 61 tests passing, 53% coverage
+- [x] Claude AI integration (Sonnet + Opus) with mock mode
+- [x] MCP Server with 6 tools for AI agent data access
+- [x] Boris Cherny's Claude Code workflow (4 commands, 4 agents, 3 skills)
+- [x] Trimaran lakehouse plugin installed + 5 rules appended to CLAUDE.md
+- [x] CC-Sensei coaching plugin installed (bilingual EN/ES)
+- [x] AWS CLI configured (us-east-2, credentials set)
+- [x] Project pushed to GitHub: [ecuadrosg36/ai-datalake-platform](https://github.com/ecuadrosg36/ai-datalake-platform)
+- [x] Python3 Windows shim for cc-sensei hooks compatibility
+- [x] Trimaran CHECKLIST.md and CLAUDE.template.md added
+
+### What's Pending 🔴
+
+- [ ] **MFA Setup** — Fix permission error for self-assigning MFA device (escalated to Rodolfo)
+- [ ] **CodeCommit Clone** — Git 403 error persists even with new credentials (escalated to Rodolfo)
+- [ ] **Explore S3 Buckets** — List contents of `oggi-lakehouse-landing` and `oggi-gm3s-landing` (requires MFA)
+- [ ] **Query Athena** — Explore `oggi_bronze`, `oggi_lake`, `oggi_ontology` tables (requires MFA)
+- [ ] **Fill CLAUDE.md Placeholders** — Add real OGGI accounts, sources, freshness cadences
+- [ ] **Build Real Pipeline** — Create a pipeline using OGGI's actual data (SAP ONE, Intelisis)
+- [ ] **Add SAP ONE Connector** — Bronze layer connector for SAP ONE ERP data
+- [ ] **Add Intelisis Connector** — Bronze layer connector for Intelisis ERP data
+- [ ] **Add MS365 Graph API Connector** — Email/OneDrive ingestion via Microsoft Graph
+- [ ] **Gold Layer Tests** — Currently 0% coverage (flagged by /pipeline-health)
+- [ ] **AI Response Caching** — 1-hour TTL cache required by CLAUDE.md but not yet implemented
+- [ ] **Update Model IDs** — Change to `claude-opus-4-8` / `claude-sonnet-4-6`
+
+---
+
 ## 📬 Author
 
-**Emanuel** — Data Engineer & AI Specialist
+**Emanuel Cuadros** — Data Engineer & AI Specialist
 
-*Built with ❤️ using Claude AI — demonstrating how one engineer with AI tools can deliver enterprise-grade data lake solutions.*
+- GitHub: [@ecuadrosg36](https://github.com/ecuadrosg36)
+
+*Built with ❤️ using Claude AI, Boris Cherny's Claude Code workflow, and Trimaran's lakehouse standard — demonstrating how one engineer with AI tools can deliver enterprise-grade data lake solutions.*
