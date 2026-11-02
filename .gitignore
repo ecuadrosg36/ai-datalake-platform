@@ -43,3 +43,6 @@ data/sample/*.parquet
 # Logs
 *.log
 logs/
+
+# Client sample data (download locally, never commit)
+oggi-samples/
