@@ -247,7 +247,7 @@ class DataAnalyzer:
                         "max": float(clean.max()),
                         "median": float(clean.median()),
                     }
-            elif series.dtype == "object":
+            elif series.dtype == "object" or pd.api.types.is_string_dtype(series):
                 col_profile["top_values"] = (
                     series.value_counts().head(5).to_dict()
                 )

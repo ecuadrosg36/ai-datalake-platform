@@ -12,6 +12,13 @@ from typing import Any
 
 import pandas as pd
 
+NULL_TOKENS = ["", "NULL", "null", "None", "none", "N/A", "n/a", "NA", "#N/A"]
+
+
+def _is_text(series: pd.Series) -> bool:
+    """True for text columns in both pandas 2 (object) and pandas 3 (str)."""
+    return series.dtype == "object" or pd.api.types.is_string_dtype(series)
+
 logger = logging.getLogger(__name__)
 
 
@@ -143,12 +150,10 @@ class SparkProcessor:
         - Boolean columns: Keep NaN
         """
         for col in df.columns:
-            if df[col].dtype == "object":
+            if _is_text(df[col]):
                 # Replace common null representations
-                df[col] = df[col].replace(
-                    ["", "NULL", "null", "None", "none", "N/A", "n/a", "NA", "#N/A"],
-                    None,
-                )
+                series = df[col].astype(object)
+                df[col] = series.where(~series.isin(NULL_TOKENS), None)
         return df
 
     def _normalize_strings(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -160,7 +165,7 @@ class SparkProcessor:
         - Standardize email addresses (lowercase)
         - Standardize country names
         """
-        for col in df.select_dtypes(include=["object"]).columns:
+        for col in [c for c in df.columns if _is_text(df[c])]:
             # Skip metadata columns
             if col.startswith("_"):
                 continue
