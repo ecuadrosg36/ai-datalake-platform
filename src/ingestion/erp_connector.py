@@ -8,14 +8,11 @@ and business rule validation.
 
 import csv
 import logging
-from decimal import Decimal, InvalidOperation
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Generator
-
-import pandas as pd
+from typing import Any
 
 from src.ingestion.base_connector import BaseConnector, IngestionConfig
-
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +72,7 @@ class ERPConnector(BaseConnector):
             raise FileNotFoundError(f"ERP data file not found: {self.data_path}")
 
         # Read CSV into list of dicts
-        with open(self.data_path, "r", encoding=self.encoding) as f:
+        with open(self.data_path, encoding=self.encoding) as f:
             reader = csv.DictReader(f, delimiter=self.delimiter)
             self._raw_data = list(reader)
 

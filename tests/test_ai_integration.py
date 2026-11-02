@@ -2,13 +2,11 @@
 Tests for Claude AI Integration.
 """
 
-import pytest
 
 from src.ai.claude_client import ClaudeClient, TokenUsage
 from src.ai.data_analyzer import DataAnalyzer
-from src.ai.query_generator import QueryGenerator
 from src.ai.quality_advisor import QualityAdvisor
-
+from src.ai.query_generator import QueryGenerator
 
 # =============================================================================
 # ClaudeClient Tests

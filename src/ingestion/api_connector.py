@@ -9,12 +9,11 @@ integrating with diverse third-party services.
 import json
 import logging
 import time
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Generator
-from urllib.parse import urljoin
+from typing import Any
 
 from src.ingestion.base_connector import BaseConnector, IngestionConfig
-
 
 logger = logging.getLogger(__name__)
 
@@ -97,7 +96,7 @@ class APIConnector(BaseConnector):
                     f"API response file not found: {self.data_path}"
                 )
 
-            with open(self.data_path, "r", encoding="utf-8") as f:
+            with open(self.data_path, encoding="utf-8") as f:
                 response_data = json.load(f)
 
             # Extract records from the data key

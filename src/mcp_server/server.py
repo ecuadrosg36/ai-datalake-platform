@@ -16,9 +16,6 @@ Run with:
 import asyncio
 import json
 import logging
-import os
-import sys
-from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -177,12 +174,12 @@ def create_mcp_server():
     """
     try:
         from mcp.server import Server
+        from mcp.server.stdio import stdio_server
         from mcp.types import (
             Resource,
             TextContent,
             Tool,
         )
-        from mcp.server.stdio import stdio_server
 
         server = Server("ai-datalake-platform")
 
@@ -376,6 +373,7 @@ def handle_query_dataset(args: dict[str, Any]) -> dict[str, Any]:
         "status": "success",
         "query": query,
         "layer": layer,
+        "limit": limit,
         "message": (
             f"Query would be executed against {layer} layer via Amazon Athena. "
             f"In production, this connects to Athena with the configured workgroup."
@@ -535,7 +533,7 @@ def main():
             for name, info in datasets.items():
                 print(f"    • {name}: {info.get('description', '')}")
 
-        print(f"\nInstall MCP SDK for full protocol support: pip install mcp")
+        print("\nInstall MCP SDK for full protocol support: pip install mcp")
         print("=" * 60)
 
 

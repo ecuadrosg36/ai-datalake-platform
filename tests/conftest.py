@@ -14,7 +14,7 @@ def sample_crm_data():
     """Load sample CRM contacts data."""
     data_path = Path("data/sample_crm_contacts.json")
     if data_path.exists():
-        with open(data_path, "r", encoding="utf-8") as f:
+        with open(data_path, encoding="utf-8") as f:
             return json.load(f)
     # Inline fallback
     return [

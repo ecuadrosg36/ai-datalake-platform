@@ -5,12 +5,10 @@ Validates data against defined schemas and supports backward-compatible
 schema evolution. Ensures data consistency across the data lake.
 """
 
-import json
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -256,7 +254,10 @@ class SchemaEnforcer:
                         "type": "null_violation",
                         "column": col_schema.name,
                         "count": int(null_count),
-                        "message": f"Non-nullable column '{col_schema.name}' has {null_count} null values",
+                        "message": (
+                            f"Non-nullable column '{col_schema.name}' "
+                            f"has {null_count} null values"
+                        ),
                     })
                     if self.mode == SchemaMode.STRICT:
                         valid_mask &= ~null_mask

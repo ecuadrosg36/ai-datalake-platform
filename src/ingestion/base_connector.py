@@ -10,13 +10,13 @@ import logging
 import time
 import uuid
 from abc import ABC, abstractmethod
+from collections.abc import Generator
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Generator
+from typing import Any
 
 import pandas as pd
-
 
 logger = logging.getLogger(__name__)
 
