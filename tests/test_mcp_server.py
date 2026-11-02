@@ -2,18 +2,16 @@
 Tests for the MCP Server.
 """
 
-import json
-import pytest
 
 from src.mcp_server.server import (
     DATA_CATALOG,
     QUALITY_REPORTS,
-    handle_query_dataset,
-    handle_get_schema,
     handle_check_quality,
-    handle_list_datasets,
-    handle_run_pipeline,
     handle_generate_insight,
+    handle_get_schema,
+    handle_list_datasets,
+    handle_query_dataset,
+    handle_run_pipeline,
 )
 
 

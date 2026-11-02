@@ -12,9 +12,10 @@ Region: us-east-2
 import io
 import logging
 import os
-from dataclasses import dataclass, field
+from collections.abc import Generator
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any
 
 import pandas as pd
 

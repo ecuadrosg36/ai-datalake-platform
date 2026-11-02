@@ -9,25 +9,23 @@ import os
 import sys
 from pathlib import Path
 
-import pytest
 import pandas as pd
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+from src.ingestion.base_connector import IngestionConfig, IngestionStatus
 from src.ingestion.oggi_s3_connector import (
-    OGGIS3Connector,
-    OGGIDatasetConfig,
-    create_oggi_connector,
-    VALID_COMPANY_IDS,
-    VALID_COMPANY_GROUPS,
+    GOLD_DATASETS,
     OGGI_BUCKET,
     OGGI_REGION,
     SILVER_DATASETS,
-    GOLD_DATASETS,
+    VALID_COMPANY_IDS,
+    OGGIDatasetConfig,
+    OGGIS3Connector,
+    create_oggi_connector,
 )
-from src.ingestion.base_connector import IngestionConfig, IngestionStatus
-
 
 # Path to downloaded sample data
 SAMPLES_DIR = Path(os.environ.get(
@@ -113,7 +111,7 @@ class TestCreateOGGIConnector:
 
 @pytest.mark.skipif(
     not DIM_COMPANY_DIR.exists(),
-    reason="OGGI sample data not downloaded. Run: aws s3 cp s3://oggi-lakehouse-landing-276483282865-us-east-2/gold/gm3s_envio/dim_company/ oggi-samples/dim_company/ --recursive"
+    reason="OGGI sample data not downloaded. Run: aws s3 cp s3://oggi-lakehouse-landing-276483282865-us-east-2/gold/gm3s_envio/dim_company/ oggi-samples/dim_company/ --recursive"  # noqa: E501
 )
 class TestOGGIConnectorWithRealData:
     """
@@ -196,7 +194,7 @@ class TestOGGIConnectorWithRealData:
         )
         df = connector.ingest()
 
-        revenue_cos = df[df["is_revenue_company"] == True]["company_id"].tolist()
+        revenue_cos = df[df["is_revenue_company"].eq(True)]["company_id"].tolist()
         assert "OGGI_MAYOREO" in revenue_cos
         assert "OGGI_JUNIOR" in revenue_cos
 
@@ -209,7 +207,7 @@ class TestOGGIConnectorWithRealData:
         )
         df = connector.ingest()
 
-        cogs_cos = df[df["is_cogs_source"] == True]["company_id"].tolist()
+        cogs_cos = df[df["is_cogs_source"].eq(True)]["company_id"].tolist()
         assert "BUYING" in cogs_cos
 
     def test_ingestion_status_success(self):

@@ -3,9 +3,8 @@ Pipeline Configuration — Loads and manages pipeline settings.
 """
 
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 import yaml
 
@@ -34,7 +33,7 @@ class PipelineConfig:
         if not config_path.exists():
             return cls()
 
-        with open(config_path, "r") as f:
+        with open(config_path) as f:
             raw = yaml.safe_load(f) or {}
 
         pipeline = raw.get("pipeline", {})

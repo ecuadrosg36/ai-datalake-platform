@@ -3,18 +3,15 @@ Tests for the Bronze Layer — Data Ingestion Connectors.
 """
 
 import json
-import tempfile
 from pathlib import Path
 
-import pandas as pd
 import pytest
 
+from src.ingestion.api_connector import APIConnector
 from src.ingestion.base_connector import IngestionConfig, IngestionStatus
 from src.ingestion.crm_connector import CRMConnector
-from src.ingestion.erp_connector import ERPConnector
 from src.ingestion.csv_ingestion import CSVIngestor
-from src.ingestion.api_connector import APIConnector
-
+from src.ingestion.erp_connector import ERPConnector
 
 # =============================================================================
 # CRM Connector Tests
@@ -51,7 +48,7 @@ class TestCRMConnector:
 
         config = IngestionConfig(source_name="test_crm", source_type="crm")
         connector = CRMConnector(config, data_path=str(data_file))
-        df = connector.ingest()
+        connector.ingest()
 
         assert connector.metrics.records_rejected > 0
 
@@ -66,7 +63,7 @@ class TestCRMConnector:
 
         config = IngestionConfig(source_name="test_crm", source_type="crm")
         connector = CRMConnector(config, data_path=str(data_file))
-        df = connector.ingest()
+        connector.ingest()
 
         assert connector.metrics.records_rejected >= 1
 
@@ -137,7 +134,7 @@ class TestERPConnector:
 
         config = IngestionConfig(source_name="test_erp", source_type="erp")
         connector = ERPConnector(config, data_path=str(data_file))
-        df = connector.ingest()
+        connector.ingest()
 
         assert connector.metrics.records_rejected > 0
 
@@ -153,7 +150,7 @@ class TestERPConnector:
 
         config = IngestionConfig(source_name="test_erp", source_type="erp")
         connector = ERPConnector(config, data_path=str(data_file))
-        df = connector.ingest()
+        connector.ingest()
 
         assert connector.metrics.records_rejected > 0
 

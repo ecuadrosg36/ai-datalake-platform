@@ -7,15 +7,12 @@ Suitable for ad-hoc file uploads from clients.
 """
 
 import csv
-import io
 import logging
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Generator
-
-import pandas as pd
+from typing import Any
 
 from src.ingestion.base_connector import BaseConnector, IngestionConfig
-
 
 logger = logging.getLogger(__name__)
 
@@ -147,7 +144,7 @@ class CSVIngestor(BaseConnector):
         """Auto-detect file encoding by trying supported encodings."""
         for enc in SUPPORTED_ENCODINGS:
             try:
-                with open(self.file_path, "r", encoding=enc) as f:  # type: ignore[arg-type]
+                with open(self.file_path, encoding=enc) as f:  # type: ignore[arg-type]
                     f.read(8192)  # Read a sample
                 return enc
             except (UnicodeDecodeError, UnicodeError):
@@ -159,7 +156,7 @@ class CSVIngestor(BaseConnector):
     def _detect_delimiter(self) -> str:
         """Auto-detect CSV delimiter using csv.Sniffer."""
         try:
-            with open(self.file_path, "r", encoding=self._detected_encoding) as f:  # type: ignore[arg-type]
+            with open(self.file_path, encoding=self._detected_encoding) as f:  # type: ignore[arg-type]
                 sample = f.read(4096)
                 sniffer = csv.Sniffer()
                 dialect = sniffer.sniff(sample, delimiters="".join(SUPPORTED_DELIMITERS))
@@ -170,7 +167,7 @@ class CSVIngestor(BaseConnector):
 
     def _read_file(self) -> None:
         """Read the CSV file into memory."""
-        with open(self.file_path, "r", encoding=self._detected_encoding) as f:  # type: ignore[arg-type]
+        with open(self.file_path, encoding=self._detected_encoding) as f:  # type: ignore[arg-type]
             # Skip rows if needed
             for _ in range(self.skip_rows):
                 next(f)

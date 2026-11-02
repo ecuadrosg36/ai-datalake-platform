@@ -3,8 +3,8 @@
 from src.ai.claude_client import ClaudeClient
 from src.ai.data_analyzer import DataAnalyzer
 from src.ai.insight_generator import InsightGenerator
-from src.ai.query_generator import QueryGenerator
 from src.ai.quality_advisor import QualityAdvisor
+from src.ai.query_generator import QueryGenerator
 
 __all__ = [
     "ClaudeClient",

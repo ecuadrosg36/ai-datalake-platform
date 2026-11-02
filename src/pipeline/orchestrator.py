@@ -17,7 +17,6 @@ Usage:
 import argparse
 import json
 import logging
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -31,21 +30,20 @@ from src.ai.quality_advisor import QualityAdvisor
 from src.analytics.aggregations import BusinessAggregator
 from src.analytics.kpi_calculator import KPICalculator
 from src.analytics.report_generator import ReportGenerator
+from src.ingestion.api_connector import APIConnector
 from src.ingestion.base_connector import IngestionConfig
 from src.ingestion.crm_connector import CRMConnector
 from src.ingestion.erp_connector import ERPConnector
-from src.ingestion.api_connector import APIConnector
 from src.pipeline.config import PipelineConfig
 from src.transformation.data_quality import DataQualityChecker
 from src.transformation.deduplication import DeduplicationEngine, DeduplicationStrategy
 from src.transformation.schema_enforcer import (
-    SchemaEnforcer,
-    SchemaMode,
     CRM_SCHEMA,
     ERP_SCHEMA,
+    SchemaEnforcer,
+    SchemaMode,
 )
 from src.transformation.spark_processor import SparkProcessor
-
 
 logger = logging.getLogger(__name__)
 
@@ -301,7 +299,7 @@ class PipelineOrchestrator:
             # KPIs
             kpis = kpi_calc.calculate_all(df_erp)
             layer_metrics["kpis"] = kpis
-            logger.info(f"  ✅ KPIs calculated")
+            logger.info("  ✅ KPIs calculated")
 
             # Generate report
             report = report_gen.generate(
@@ -344,7 +342,7 @@ class PipelineOrchestrator:
 
         usage = self.results.get("claude_usage", {})
         tokens = usage.get("usage", {})
-        logger.info(f"\n  Claude AI Usage:")
+        logger.info("\n  Claude AI Usage:")
         logger.info(f"    Requests: {tokens.get('total_requests', 0)}")
         logger.info(f"    Tokens:   {tokens.get('total_tokens', 0)}")
         logger.info(f"{'=' * 60}\n")

@@ -9,11 +9,11 @@ for standardized Bronze layer storage.
 import json
 import logging
 import re
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any
 
 from src.ingestion.base_connector import BaseConnector, IngestionConfig
-
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +85,7 @@ class CRMConnector(BaseConnector):
                 raise FileNotFoundError(
                     f"CRM data file not found: {self.data_path}"
                 )
-            with open(self.data_path, "r", encoding="utf-8") as f:
+            with open(self.data_path, encoding="utf-8") as f:
                 self._raw_data = json.load(f)
 
             self.logger.info(
